@@ -1,6 +1,7 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { warpNotify } from "./src/osc.js";
 import { shouldUseStructured } from "./src/version.js";
+import { startSpinner, stopSpinner } from "./src/title.js";
 import {
   buildSessionStartPayload,
   buildStopPayload,
@@ -34,6 +35,9 @@ export default function (pi: ExtensionAPI): void {
 
     const payload = buildPromptSubmitPayload(ctx, event.prompt);
     warpNotify(payload);
+
+    // Start animated terminal title spinner
+    startSpinner(ctx);
   });
 
   // -----------------------------------------------------------------------
@@ -44,6 +48,9 @@ export default function (pi: ExtensionAPI): void {
 
     const payload = buildStopPayload(ctx, event.messages);
     warpNotify(payload);
+
+    // Stop spinner and set static "ready" title
+    stopSpinner(ctx);
   });
 
   // -----------------------------------------------------------------------
