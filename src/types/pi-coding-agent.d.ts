@@ -15,6 +15,7 @@ declare module "@earendil-works/pi-coding-agent" {
     cwd: string;
     sessionManager: {
       getSessionFile(): string | undefined;
+      getSessionName(): string | undefined;
     };
     ui: {
       notify(message: string, level: string): void;

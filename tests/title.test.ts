@@ -3,7 +3,7 @@
  *
  * Covers:
  * - formatOsc0: correct escape sequence
- * - buildTitle: static title construction
+ * - buildTitle: static title construction (with/without custom session name)
  * - startSpinner / stopSpinner: timer lifecycle
  * - isSpinnerActive: state query
  */
@@ -40,49 +40,64 @@ describe("formatOsc0", () => {
 // buildTitle
 // ---------------------------------------------------------------------------
 describe("buildTitle", () => {
-  it("builds title from cwd basename and session file", () => {
+  it("includes session name when user has set one", () => {
     const ctx = {
       cwd: "/home/user/my-app",
-      sessionManager: { getSessionFile: () => "/sessions/abc123.jsonl" },
+      sessionManager: {
+        getSessionFile: () => "/sessions/abc123.jsonl",
+        getSessionName: () => "Refactor auth",
+      },
     };
 
-    expect(buildTitle(ctx)).toBe("π abc123 — my-app");
+    expect(buildTitle(ctx)).toBe("π Refactor auth — my-app");
   });
 
-  it("uses 'session' when no session file", () => {
+  it("omits session when no custom name (auto-generated)", () => {
     const ctx = {
       cwd: "/home/user/project",
-      sessionManager: { getSessionFile: () => undefined },
+      sessionManager: {
+        getSessionFile: () => "/sessions/2026-05-14T04-44-13_019e24cc.jsonl",
+        getSessionName: () => undefined,
+      },
     };
 
-    expect(buildTitle(ctx)).toBe("π session — project");
+    expect(buildTitle(ctx)).toBe("π — project");
   });
 
-  it("handles session file without extension", () => {
+  it("omits session when getSessionName returns empty string", () => {
     const ctx = {
       cwd: "/home/user/project",
-      sessionManager: { getSessionFile: () => "/sessions/my-session" },
+      sessionManager: {
+        getSessionFile: () => "/sessions/abc.jsonl",
+        getSessionName: () => "",
+      },
     };
 
-    expect(buildTitle(ctx)).toBe("π my-session — project");
+    expect(buildTitle(ctx)).toBe("π — project");
   });
 
   it("handles empty cwd", () => {
     const ctx = {
       cwd: "",
-      sessionManager: { getSessionFile: () => "/sessions/s.jsonl" },
+      sessionManager: {
+        getSessionFile: () => "/sessions/s.jsonl",
+        getSessionName: () => undefined,
+      },
     };
 
-    expect(buildTitle(ctx)).toBe("π s — ");
+    expect(buildTitle(ctx)).toBe("π — ");
   });
 
-  it("strips only last extension from session file", () => {
+  it("shows session name with empty cwd", () => {
     const ctx = {
-      cwd: "/home/user/app",
-      sessionManager: { getSessionFile: () => "/sessions/archive.tar.gz" },
+      cwd: "",
+      sessionManager: {
+        getSessionFile: () => "/sessions/s.jsonl",
+        getSessionName: () => "My Session",
+      },
     };
 
-    expect(buildTitle(ctx)).toBe("π archive.tar — app");
+    expect(buildTitle(ctx)).toBe("π My Session — ");
   });
 });
 
@@ -92,7 +107,10 @@ describe("buildTitle", () => {
 describe("spinner lifecycle", () => {
   const ctx = {
     cwd: "/home/user/project",
-    sessionManager: { getSessionFile: () => "/sess/abc.jsonl" },
+    sessionManager: {
+      getSessionFile: () => "/sess/abc.jsonl",
+      getSessionName: () => undefined,
+    },
   };
 
   beforeEach(() => {

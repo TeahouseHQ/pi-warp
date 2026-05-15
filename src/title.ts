@@ -34,21 +34,23 @@ function setTitle(title: string): void {
 }
 
 /**
- * Build the static title string: "π session — project"
+ * Build the static title string.
+ *
+ * With user-named session: "π My Session — project"
+ * Without (auto-generated): "π — project"
+ *
+ * The session name is only included when the user has explicitly set one
+ * via `/name` — default auto-generated sessions are omitted.
  */
 export function buildTitle(
-  ctx: { cwd: string; sessionManager: { getSessionFile(): string | undefined } }
+  ctx: { cwd: string; sessionManager: { getSessionFile(): string | undefined; getSessionName(): string | undefined } }
 ): string {
   const project = ctx.cwd ? ctx.cwd.split("/").pop() ?? "" : "";
-  const sessionFile = ctx.sessionManager.getSessionFile();
-  // Use basename of session file without extension as session label
-  let session = "session";
-  if (sessionFile) {
-    const base = sessionFile.split("/").pop() ?? "";
-    const dot = base.lastIndexOf(".");
-    session = dot > 0 ? base.slice(0, dot) : base;
+  const sessionName = ctx.sessionManager.getSessionName();
+  if (sessionName) {
+    return `π ${sessionName} — ${project}`;
   }
-  return `π ${session} — ${project}`;
+  return `π — ${project}`;
 }
 
 /**
@@ -56,7 +58,7 @@ export function buildTitle(
  * Call this when the agent begins working (before_agent_start).
  */
 export function startSpinner(
-  ctx: { cwd: string; sessionManager: { getSessionFile(): string | undefined } }
+  ctx: { cwd: string; sessionManager: { getSessionFile(): string | undefined; getSessionName(): string | undefined } }
 ): void {
   stopSpinner(); // clear any existing timer
 
@@ -74,7 +76,7 @@ export function startSpinner(
  * Call this when the agent finishes (agent_end).
  */
 export function stopSpinner(
-  ctx?: { cwd: string; sessionManager: { getSessionFile(): string | undefined } }
+  ctx?: { cwd: string; sessionManager: { getSessionFile(): string | undefined; getSessionName(): string | undefined } }
 ): void {
   if (timer !== null) {
     clearInterval(timer);
