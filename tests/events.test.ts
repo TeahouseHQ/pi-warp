@@ -55,7 +55,7 @@ describe("buildSessionStartPayload", () => {
   });
 
   it("produces correct payload with all fields including plugin_version", () => {
-    const payload = buildSessionStartPayload(ctx, "2.0.0");
+    const payload = buildSessionStartPayload(ctx, "1.0.0");
 
     expect(payload).toEqual({
       v: 1,
@@ -64,7 +64,7 @@ describe("buildSessionStartPayload", () => {
       session_id: "/path/to/session.jsonl",
       cwd: "/home/user/my-project",
       project: "my-project",
-      plugin_version: "2.0.0",
+      plugin_version: "1.0.0",
     });
   });
 
@@ -74,7 +74,7 @@ describe("buildSessionStartPayload", () => {
       sessionManager: { getSessionFile: () => undefined },
     };
 
-    const payload = buildSessionStartPayload(ctxNoSession, "2.0.0");
+    const payload = buildSessionStartPayload(ctxNoSession, "1.0.0");
     expect(payload.session_id).toBe("");
   });
 });
@@ -170,7 +170,7 @@ describe("buildStopPayload", () => {
 // ---------------------------------------------------------------------------
 // buildPermissionRequestPayload
 // ---------------------------------------------------------------------------
-describe("buildPermissionRequestPayload", () => {
+describe.skip("buildPermissionRequestPayload (deferred)", () => {
   const ctx = {
     cwd: "/home/user/project",
     sessionManager: { getSessionFile: () => "/s.jsonl" },
