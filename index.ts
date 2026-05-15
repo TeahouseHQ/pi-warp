@@ -26,11 +26,11 @@ const PLUGIN_VERSION: string = pkg.version;
 // Extension entry point
 // ---------------------------------------------------------------------------
 
-export default function (pi: ExtensionAPI) {
+export default function (pi: ExtensionAPI): void {
   // -----------------------------------------------------------------------
   // Hook 1: Notify Warp when user submits a prompt and agent starts working
   // -----------------------------------------------------------------------
-  pi.on("before_agent_start", async (event, ctx) => {
+  pi.on("before_agent_start", async (event: { prompt?: string }, ctx: Parameters<typeof buildPromptSubmitPayload>[0]) => {
     if (!shouldUseStructured()) return;
 
     const payload = buildPromptSubmitPayload(ctx, event.prompt);
@@ -40,7 +40,7 @@ export default function (pi: ExtensionAPI) {
   // -----------------------------------------------------------------------
   // Hook 2: Notify Warp when the agent completes its work
   // -----------------------------------------------------------------------
-  pi.on("agent_end", async (event, ctx) => {
+  pi.on("agent_end", async (event: { messages: Parameters<typeof buildStopPayload>[1] }, ctx: Parameters<typeof buildStopPayload>[0]) => {
     if (!shouldUseStructured()) return;
 
     const payload = buildStopPayload(ctx, event.messages);
@@ -50,7 +50,7 @@ export default function (pi: ExtensionAPI) {
   // -----------------------------------------------------------------------
   // Hook 3: Session start — emit structured payload with plugin version
   // -----------------------------------------------------------------------
-  pi.on("session_start", async (_event, ctx) => {
+  pi.on("session_start", async (_event: unknown, ctx: Parameters<typeof buildSessionStartPayload>[0] & { ui: { notify(message: string, level: string): void } }) => {
     if (!shouldUseStructured()) {
       console.log(
         "[warp-notify] Warp not detected or structured notifications not supported."
@@ -66,7 +66,7 @@ export default function (pi: ExtensionAPI) {
   // -----------------------------------------------------------------------
   // Hook 4: Tool execution end — emit tool_complete notification
   // -----------------------------------------------------------------------
-  pi.on("tool_execution_end", async (event, ctx) => {
+  pi.on("tool_execution_end", async (event: { toolName: string }, ctx: Parameters<typeof buildToolCompletePayload>[0]) => {
     if (!shouldUseStructured()) return;
 
     const payload = buildToolCompletePayload(ctx, event.toolName);
@@ -76,13 +76,13 @@ export default function (pi: ExtensionAPI) {
   // -----------------------------------------------------------------------
   // Hook 5: Tool call — emit permission_request notification (informational)
   // -----------------------------------------------------------------------
-  pi.on("tool_call", async (event, ctx) => {
+  pi.on("tool_call", async (event: { toolName: string; input: Record<string, unknown> }, ctx: Parameters<typeof buildPermissionRequestPayload>[0]) => {
     if (!shouldUseStructured()) return;
 
     const payload = buildPermissionRequestPayload(
       ctx,
       event.toolName,
-      event.input as Record<string, unknown>
+      event.input
     );
     warpNotify(payload);
     // Do NOT return { block: true } — notification only

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatOsc777, warpNotify } from "../src/osc.js";
+import { formatOsc777 } from "../src/osc.js";
 
 describe("formatOsc777", () => {
   it("produces the exact expected escape sequence", () => {

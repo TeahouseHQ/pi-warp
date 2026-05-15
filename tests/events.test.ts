@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   buildSessionStartPayload,
   buildStopPayload,
@@ -137,10 +137,10 @@ describe("buildStopPayload", () => {
 
     const payload = buildStopPayload(ctx, messages);
 
-    expect(payload.query!.length).toBe(MAX_FIELD);
-    expect(payload.query!.endsWith("...")).toBe(true);
-    expect(payload.response!.length).toBe(MAX_FIELD);
-    expect(payload.response!.endsWith("...")).toBe(true);
+    expect((payload.query as string).length).toBe(MAX_FIELD);
+    expect((payload.query as string).endsWith("...")).toBe(true);
+    expect((payload.response as string).length).toBe(MAX_FIELD);
+    expect((payload.response as string).endsWith("...")).toBe(true);
   });
 
   it("handles empty messages gracefully", () => {
@@ -230,7 +230,7 @@ describe("buildPermissionRequestPayload", () => {
 
     expect(payload.tool_name).toBe("custom");
     expect(payload.summary).toContain("Wants to run custom: ");
-    expect(payload.summary!.length).toBeLessThanOrEqual(
+    expect((payload.summary as string).length).toBeLessThanOrEqual(
       "Wants to run custom: ".length + 120
     );
   });
@@ -243,7 +243,7 @@ describe("buildPermissionRequestPayload", () => {
 
     // summary format: "Wants to run bash: <preview>"
     const prefix = "Wants to run bash: ";
-    expect(payload.summary!.length).toBeLessThanOrEqual(prefix.length + 120);
+    expect((payload.summary as string).length).toBeLessThanOrEqual(prefix.length + 120);
   });
 
   it("includes all base payload fields", () => {

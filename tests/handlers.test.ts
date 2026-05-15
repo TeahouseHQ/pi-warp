@@ -5,7 +5,7 @@
  * verifying that warpNotify is called with the correct payloads and
  * that tool_call handlers do not block execution.
  */
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { buildPermissionRequestPayload } from "../src/events.js";
 describe("tool_call handler behavior", () => {
   beforeEach(() => {
