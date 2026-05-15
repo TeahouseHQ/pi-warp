@@ -4,7 +4,6 @@ import { shouldUseStructured } from "./src/version.js";
 import {
   buildSessionStartPayload,
   buildStopPayload,
-  buildPermissionRequestPayload,
   buildPromptSubmitPayload,
   buildToolCompletePayload,
 } from "./src/events.js";
@@ -74,17 +73,7 @@ export default function (pi: ExtensionAPI): void {
   });
 
   // -----------------------------------------------------------------------
-  // Hook 5: Tool call — emit permission_request notification (informational)
+  // Hook 5: DISABLED — permission_request is not wired to tool_call.
+  // See README for details on deferred permission_request support.
   // -----------------------------------------------------------------------
-  pi.on("tool_call", async (event: { toolName: string; input: Record<string, unknown> }, ctx: Parameters<typeof buildPermissionRequestPayload>[0]) => {
-    if (!shouldUseStructured()) return;
-
-    const payload = buildPermissionRequestPayload(
-      ctx,
-      event.toolName,
-      event.input
-    );
-    warpNotify(payload);
-    // Do NOT return { block: true } — notification only
-  });
 }

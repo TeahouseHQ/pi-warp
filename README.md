@@ -12,7 +12,7 @@ The extension hooks into pi's lifecycle events and emits structured JSON payload
 |---|---|---|
 | **Session start** | pi session begins | `session_start` |
 | **Prompt submit** | User submits a prompt | `prompt_submit` |
-| **Permission request** | Agent calls a tool | `permission_request` |
+| **Permission request** | *(unused — deferred)* | `permission_request` |
 | **Tool complete** | Tool execution finishes | `tool_complete` |
 | **Agent end** | Agent finishes its work | `stop` |
 
@@ -64,6 +64,8 @@ Each payload includes a common base:
 ```
 
 Individual events add their own fields (e.g. `query`, `response`, `tool_name`, `plugin_version`).
+
+> **Note:** `permission_request` payloads and the `tool_call` hook are implemented in `src/events.ts` but **not wired to any pi lifecycle event**. They are deferred until Warp defines a UX for permission notifications. The builder function (`buildPermissionRequestPayload`) is exported and tested but currently unused.
 
 ## License
 

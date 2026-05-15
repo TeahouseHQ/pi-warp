@@ -7,7 +7,7 @@
  */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { buildPermissionRequestPayload } from "../src/events.js";
-describe("tool_call handler behavior", () => {
+describe.skip("tool_call handler behavior (deferred)", () => {
   beforeEach(() => {
     process.env.WARP_CLI_AGENT_PROTOCOL_VERSION = "1";
     process.env.WARP_CLIENT_VERSION = "v0.2026.04.01.00.00.stable_01";

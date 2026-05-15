@@ -118,9 +118,6 @@ export function buildStopPayload(
   };
 }
 
-// ---------------------------------------------------------------------------
-// Tool Call / Permission Request
-// ---------------------------------------------------------------------------
 
 /**
  * Build a `permission_request` payload with a human-readable summary.
