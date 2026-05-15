@@ -36,6 +36,26 @@ Clone or copy this directory into your pi extensions folder and install dependen
 npm install
 ```
 
+## Settings
+
+Run `/warp-settings` in pi to open the interactive settings panel.
+
+| Setting | Default | Description |
+|---|---|---|
+| **Dynamic Terminal Titles** | on | Animate the terminal title with a braille spinner while the agent is working |
+
+Settings are persisted in pi's global settings (`~/.pi/agent/settings.json`) under the `warpNotify` key:
+
+```json
+{
+  "warpNotify": {
+    "dynamicTitles": true
+  }
+}
+```
+
+You can also edit the JSON file directly.
+
 ## Development
 
 ```bash

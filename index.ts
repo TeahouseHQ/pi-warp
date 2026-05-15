@@ -1,4 +1,6 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { getSettingsListTheme } from "@earendil-works/pi-coding-agent";
+import { Container, type SettingItem, SettingsList } from "@earendil-works/pi-tui";
 import { warpNotify } from "./src/osc.js";
 import { shouldUseStructured } from "./src/version.js";
 import { startSpinner, stopSpinner } from "./src/title.js";
@@ -8,6 +10,7 @@ import {
   buildPromptSubmitPayload,
   buildToolCompletePayload,
 } from "./src/events.js";
+import { loadSettings, saveSetting, type WarpNotifySettings } from "./src/settings.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
@@ -28,6 +31,63 @@ const PLUGIN_VERSION: string = pkg.version;
 
 export default function (pi: ExtensionAPI): void {
   // -----------------------------------------------------------------------
+  // /warp-settings command — toggle extension settings
+  // -----------------------------------------------------------------------
+  pi.registerCommand("warp-settings", {
+    description: "Configure warp-notify extension settings",
+    handler: async (_args, ctx) => {
+      const current = loadSettings();
+
+      const items: SettingItem[] = [
+        {
+          id: "dynamicTitles",
+          label: "Dynamic Terminal Titles",
+          currentValue: current.dynamicTitles ? "on" : "off",
+          values: ["on", "off"],
+        },
+      ];
+
+      await ctx.ui.custom((_tui, theme, _kb, done) => {
+        const container = new Container();
+        container.addChild({
+          render() {
+            return [theme.fg("accent", theme.bold("warp-notify Settings")), ""];
+          },
+          invalidate() {},
+        });
+
+        const settingsList = new SettingsList(
+          items,
+          Math.min(items.length + 2, 15),
+          getSettingsListTheme(),
+          (id: string, newValue: string) => {
+            const key = id as keyof WarpNotifySettings;
+            if (key === "dynamicTitles") {
+              const enabled = newValue === "on";
+              saveSetting(key, enabled);
+              ctx.ui.notify(
+                `Dynamic titles ${enabled ? "enabled" : "disabled"}`,
+                "info",
+              );
+            }
+          },
+          () => done(undefined),
+        );
+
+        container.addChild(settingsList);
+
+        return {
+          render: (w: number) => container.render(w),
+          invalidate: () => container.invalidate(),
+          handleInput: (data: string) => {
+            settingsList.handleInput?.(data);
+          },
+        };
+      });
+    },
+  });
+
+  // -----------------------------------------------------------------------
   // Hook 1: Notify Warp when user submits a prompt and agent starts working
   // -----------------------------------------------------------------------
   pi.on("before_agent_start", async (event: { prompt?: string }, ctx: Parameters<typeof buildPromptSubmitPayload>[0]) => {
@@ -36,8 +96,10 @@ export default function (pi: ExtensionAPI): void {
     const payload = buildPromptSubmitPayload(ctx, event.prompt);
     warpNotify(payload);
 
-    // Start animated terminal title spinner
-    startSpinner(ctx);
+    // Start animated terminal title spinner (respects setting)
+    if (loadSettings().dynamicTitles) {
+      startSpinner(ctx);
+    }
   });
 
   // -----------------------------------------------------------------------
