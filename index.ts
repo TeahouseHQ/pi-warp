@@ -116,7 +116,9 @@ export default function (pi: ExtensionAPI): void {
   });
 
   // -----------------------------------------------------------------------
-  // Hook 3: Session start — emit structured payload with plugin version
+  // Hook 3: Session start — emit structured payload with plugin version,
+  // then after a short delay emit a "stop" event so Warp shows a ready
+  // (idle) state instead of staying in-progress.
   // -----------------------------------------------------------------------
   pi.on("session_start", async (_event: unknown, ctx: Parameters<typeof buildSessionStartPayload>[0] & { ui: { notify(message: string, level: string): void } }) => {
     if (!shouldUseStructured()) {
@@ -129,6 +131,13 @@ export default function (pi: ExtensionAPI): void {
     const payload = buildSessionStartPayload(ctx, PLUGIN_VERSION);
     sendNotification(payload);
     ctx.ui.notify("Warp notifications active ✓", "info");
+
+    // After a brief delay, tell Warp the agent is idle so it shows "ready"
+    setTimeout(() => {
+      const stopPayload = buildStopPayload(ctx, []);
+      sendNotification(stopPayload);
+      stopSpinner(ctx);
+    }, 500);
   });
 
   // -----------------------------------------------------------------------

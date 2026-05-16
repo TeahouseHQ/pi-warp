@@ -1,2 +1,3 @@
 node_modules/
 tasks/
+.DS_Store

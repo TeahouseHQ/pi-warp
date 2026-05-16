@@ -4,6 +4,8 @@ Real-time [pi](https://github.com/earendil-works/pi-coding-agent) notifications 
 
 pi-warp surfaces pi agent activity inline in Warp — so you always know what the agent is doing without switching context.
 
+![](static/demo.gif)
+
 ## Features
 
 - **Session tracking** — Warp knows when pi starts and stops a session.
