@@ -1,3 +1,4 @@
 node_modules/
+dist/
 tasks/
 .DS_Store
