@@ -1,7 +1,7 @@
 /**
  * Notification event builders for Warp.
  *
- * Each function produces a complete payload ready for warpNotify().
+ * Each function produces a complete payload ready for sendNotification().
  */
 
 import { buildBasePayload } from "./payload.js";

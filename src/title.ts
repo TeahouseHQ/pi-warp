@@ -43,10 +43,10 @@ function setTitle(title: string): void {
  * via `/name` — default auto-generated sessions are omitted.
  */
 export function buildTitle(
-  ctx: { cwd: string; sessionManager: { getSessionFile(): string | undefined; getSessionName(): string | undefined } }
+  ctx: { cwd: string; sessionManager: { getSessionFile(): string | undefined; getSessionName?(): string | undefined } }
 ): string {
   const project = ctx.cwd ? ctx.cwd.split("/").pop() ?? "" : "";
-  const sessionName = ctx.sessionManager.getSessionName();
+  const sessionName = ctx.sessionManager.getSessionName?.();
   if (sessionName) {
     return `π ${sessionName} — ${project}`;
   }
@@ -58,7 +58,7 @@ export function buildTitle(
  * Call this when the agent begins working (before_agent_start).
  */
 export function startSpinner(
-  ctx: { cwd: string; sessionManager: { getSessionFile(): string | undefined; getSessionName(): string | undefined } }
+  ctx: { cwd: string; sessionManager: { getSessionFile(): string | undefined; getSessionName?(): string | undefined } }
 ): void {
   stopSpinner(); // clear any existing timer
 
@@ -76,7 +76,7 @@ export function startSpinner(
  * Call this when the agent finishes (agent_end).
  */
 export function stopSpinner(
-  ctx?: { cwd: string; sessionManager: { getSessionFile(): string | undefined; getSessionName(): string | undefined } }
+  ctx?: { cwd: string; sessionManager: { getSessionFile(): string | undefined; getSessionName?(): string | undefined } }
 ): void {
   if (timer !== null) {
     clearInterval(timer);

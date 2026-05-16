@@ -1,11 +1,11 @@
 /**
  * Extension settings — persisted in pi global settings.
  *
- * Settings are stored under the `warpNotify` key in
+ * Settings are stored under the `piWarp` key in
  * `~/.pi/agent/settings.json` so they survive restarts.
  *
  * Schema:
- *   warpNotify.dynamicTitles: boolean  (default: true)
+ *   piWarp.dynamicTitles: boolean  (default: true)
  */
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -65,12 +65,12 @@ function writeGlobalSettings(settings: Record<string, unknown>): void {
 // ---------------------------------------------------------------------------
 
 /**
- * Load the warpNotify settings from pi global settings.
+ * Load the piWarp settings from pi global settings.
  * Returns a full settings object with defaults applied.
  */
 export function loadSettings(): WarpNotifySettings {
   const global = readGlobalSettings();
-  const ext = (global.warpNotify ?? {}) as Partial<WarpNotifySettings>;
+  const ext = (global.piWarp ?? {}) as Partial<WarpNotifySettings>;
 
   return {
     dynamicTitles: ext.dynamicTitles ?? DEFAULTS.dynamicTitles,
@@ -78,17 +78,17 @@ export function loadSettings(): WarpNotifySettings {
 }
 
 /**
- * Persist a single setting key under the `warpNotify` namespace.
- * Merges with existing warpNotify settings so sibling keys are preserved.
+ * Persist a single setting key under the `piWarp` namespace.
+ * Merges with existing piWarp settings so sibling keys are preserved.
  */
 export function saveSetting<K extends keyof WarpNotifySettings>(
   key: K,
   value: WarpNotifySettings[K],
 ): void {
   const global = readGlobalSettings();
-  const current = (global.warpNotify ?? {}) as Record<string, unknown>;
+  const current = (global.piWarp ?? {}) as Record<string, unknown>;
   current[key] = value;
-  global.warpNotify = current;
+  global.piWarp = current;
   writeGlobalSettings(global);
 }
 

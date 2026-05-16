@@ -1,92 +1,88 @@
-# warp-notify
+# pi-warp
 
-A [pi](https://github.com/earendil-works/pi-coding-agent) extension that sends real-time agent notifications to the [Warp](https://www.warp.dev/) terminal via OSC 777 escape sequences.
+Real-time [pi](https://github.com/earendil-works/pi-coding-agent) notifications in the [Warp](https://www.warp.dev/) terminal.
 
-## How it works
+pi-warp surfaces pi agent activity inline in Warp — so you always know what the agent is doing without switching context.
 
-The extension hooks into pi's lifecycle events and emits structured JSON payloads to `/dev/tty` using Warp's OSC 777 notification protocol. Warp picks up these sequences and surfaces agent activity inline in the terminal.
+## Features
 
-### Supported events
-
-| Event | Trigger | Payload type |
-|---|---|---|
-| **Session start** | pi session begins | `session_start` |
-| **Prompt submit** | User submits a prompt | `prompt_submit` |
-| **Permission request** | *(unused — deferred)* | `permission_request` |
-| **Tool complete** | Tool execution finishes | `tool_complete` |
-| **Agent end** | Agent finishes its work | `stop` |
+- **Session tracking** — Warp knows when pi starts and stops a session.
+- **Prompt notifications** — see when your prompt has been submitted and the agent begins working.
+- **Tool result alerts** — get notified each time a tool finishes executing.
+- **Completion signal** — Warp tells you when the agent has finished its work.
+- **Animated terminal title** — an optional braille spinner in your terminal title while the agent is busy.
 
 ## Requirements
 
-- **Warp terminal** with CLI agent notification support (builds newer than `v0.2026.03.25.08.04.stable_05` / `v0.2026.03.25.08.04.preview_05`)
-- **pi** coding agent
-- **Node.js** ≥ 20
+- **[Warp](https://www.warp.dev/)** — build newer than `v0.2026.03.25.08.24.stable_05` (stable) or `v0.2026.03.25.08.24.preview_05` (preview). Dev channel builds are always supported.
+- **[pi](https://github.com/earendil-works/pi-coding-agent)** coding agent.
+- **Node.js** ≥ 20.
 
-Warp signals support through two environment variables:
-- `WARP_CLI_AGENT_PROTOCOL_VERSION` — protocol version to negotiate
-- `WARP_CLIENT_VERSION` — used to detect known-broken builds
-
-If either variable is missing, the extension silently disables itself.
+> pi-warp detects Warp automatically. If you're running an incompatible build or not inside Warp, the extension silently disables itself — nothing breaks.
 
 ## Installation
 
-Clone or copy this directory into your pi extensions folder and install dependencies:
-
 ```bash
-npm install
+pi install npm:pi-warp
 ```
 
-## Settings
+Or manually: clone this repository into your pi extensions directory (`~/.pi/agent/extensions/`).
 
-Run `/warp-settings` in pi to open the interactive settings panel.
+## Usage
+
+No configuration needed — notifications start automatically when you launch pi inside Warp.
+
+You'll see inline Warp notifications as the agent:
+
+1. **Starts a session** — confirms the extension is active.
+2. **Receives your prompt** — shows the agent is working.
+3. **Completes a tool call** — one notification per tool execution.
+4. **Finishes its work** — lets you know the agent is done.
+
+### Settings
+
+Run the following command inside pi to open the settings panel:
+
+```
+/pi-warp-settings
+```
 
 | Setting | Default | Description |
 |---|---|---|
 | **Dynamic Terminal Titles** | on | Animate the terminal title with a braille spinner while the agent is working |
 
-Settings are persisted in pi's global settings (`~/.pi/agent/settings.json`) under the `warpNotify` key:
+<details>
+<summary>Editing settings directly</summary>
+
+Settings are stored in pi's global config at `~/.pi/agent/settings.json` under the `piWarp` key:
 
 ```json
 {
-  "warpNotify": {
-    "dynamicTitles": true
+  "piWarp": {
+    "dynamicTitles": false
   }
 }
 ```
 
-You can also edit the JSON file directly.
+</details>
 
-## Development
+## Troubleshooting
 
-```bash
-npm test        # run tests with vitest
-```
+**I don't see any notifications**
 
-## Protocol
+- Make sure you're running pi **inside Warp** (not another terminal emulator).
+- Check your Warp version meets the minimum listed in [Requirements](#requirements).
+- pi-warp prints a message on session start if Warp was not detected — look for it in your pi log.
 
-Notifications are written as OSC 777 sequences to `/dev/tty`:
+**Notifications stopped after a Warp update**
 
-```
-\x1b]777;notify;warp://cli-agent;<json-payload>\x07
-```
+- Warp may have changed its environment variables. Open a new terminal window and try again.
+- If the issue persists, [file an issue](../../issues).
 
-Each payload includes a common base:
+**The spinner in the terminal title is distracting**
 
-```jsonc
-{
-  "v": 1,              // negotiated protocol version
-  "agent": "pi",
-  "event": "stop",     // event type
-  "session_id": "...",
-  "cwd": "/path/to/project",
-  "project": "my-project"
-}
-```
-
-Individual events add their own fields (e.g. `query`, `response`, `tool_name`, `plugin_version`).
-
-> **Note:** `permission_request` payloads and the `tool_call` hook are implemented in `src/events.ts` but **not wired to any pi lifecycle event**. They are deferred until Warp defines a UX for permission notifications. The builder function (`buildPermissionRequestPayload`) is exported and tested but currently unused.
+- Run `/pi-warp-settings` in pi and set **Dynamic Terminal Titles** to `off`.
 
 ## License
 
-Private
+MIT

@@ -2,7 +2,7 @@
  * Integration tests for event handlers wired in index.ts.
  *
  * These test the handler behavior by simulating the pi.on() wiring,
- * verifying that warpNotify is called with the correct payloads and
+ * verifying that sendNotification is called with the correct payloads and
  * that tool_call handlers do not block execution.
  */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";

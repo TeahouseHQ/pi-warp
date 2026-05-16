@@ -1,7 +1,7 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { getSettingsListTheme } from "@earendil-works/pi-coding-agent";
 import { Container, type SettingItem, SettingsList } from "@earendil-works/pi-tui";
-import { warpNotify } from "./src/osc.js";
+import { sendNotification } from "./src/osc.js";
 import { shouldUseStructured } from "./src/version.js";
 import { startSpinner, stopSpinner } from "./src/title.js";
 import {
@@ -33,8 +33,8 @@ export default function (pi: ExtensionAPI): void {
   // -----------------------------------------------------------------------
   // /warp-settings command — toggle extension settings
   // -----------------------------------------------------------------------
-  pi.registerCommand("warp-settings", {
-    description: "Configure warp-notify extension settings",
+  pi.registerCommand("pi-warp-settings", {
+    description: "Configure pi-warp extension settings",
     handler: async (_args, ctx) => {
       const current = loadSettings();
 
@@ -51,7 +51,7 @@ export default function (pi: ExtensionAPI): void {
         const container = new Container();
         container.addChild({
           render() {
-            return [theme.fg("accent", theme.bold("warp-notify Settings")), ""];
+            return [theme.fg("accent", theme.bold("pi-warp Settings")), ""];
           },
           invalidate() {},
         });
@@ -94,7 +94,7 @@ export default function (pi: ExtensionAPI): void {
     if (!shouldUseStructured()) return;
 
     const payload = buildPromptSubmitPayload(ctx, event.prompt);
-    warpNotify(payload);
+    sendNotification(payload);
 
     // Start animated terminal title spinner (respects setting)
     if (loadSettings().dynamicTitles) {
@@ -109,7 +109,7 @@ export default function (pi: ExtensionAPI): void {
     if (!shouldUseStructured()) return;
 
     const payload = buildStopPayload(ctx, event.messages);
-    warpNotify(payload);
+    sendNotification(payload);
 
     // Stop spinner and set static "ready" title
     stopSpinner(ctx);
@@ -121,13 +121,13 @@ export default function (pi: ExtensionAPI): void {
   pi.on("session_start", async (_event: unknown, ctx: Parameters<typeof buildSessionStartPayload>[0] & { ui: { notify(message: string, level: string): void } }) => {
     if (!shouldUseStructured()) {
       console.log(
-        "[warp-notify] Warp not detected or structured notifications not supported."
+        "[pi-warp] Warp not detected or structured notifications not supported."
       );
       return;
     }
 
     const payload = buildSessionStartPayload(ctx, PLUGIN_VERSION);
-    warpNotify(payload);
+    sendNotification(payload);
     ctx.ui.notify("Warp notifications active ✓", "info");
   });
 
@@ -138,7 +138,7 @@ export default function (pi: ExtensionAPI): void {
     if (!shouldUseStructured()) return;
 
     const payload = buildToolCompletePayload(ctx, event.toolName);
-    warpNotify(payload);
+    sendNotification(payload);
   });
 
   // -----------------------------------------------------------------------

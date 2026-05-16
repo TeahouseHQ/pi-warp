@@ -5,7 +5,7 @@
  * - loadSettings returns defaults when no settings exist
  * - loadSettings returns stored values
  * - saveSetting persists a single key
- * - saveSetting merges with existing warpNotify keys
+ * - saveSetting merges with existing piWarp keys
  * - dynamicTitlesEnabled convenience function
  */
 
@@ -27,7 +27,7 @@ import { setSettingsPathOverride } from "../src/settings.js";
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = path.join(os.tmpdir(), `warp-notify-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  tmpDir = path.join(os.tmpdir(), `pi-warp-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
   fs.mkdirSync(path.join(tmpDir, ".pi", "agent"), { recursive: true });
   setSettingsPathOverride(path.join(tmpDir, ".pi", "agent", "settings.json"));
 });
@@ -45,7 +45,7 @@ describe("loadSettings", () => {
     expect(loadSettings()).toEqual({ dynamicTitles: true });
   });
 
-  it("returns defaults when file has no warpNotify key", () => {
+  it("returns defaults when file has no piWarp key", () => {
     fs.writeFileSync(
       path.join(tmpDir, ".pi", "agent", "settings.json"),
       JSON.stringify({ theme: "dark" }),
@@ -56,7 +56,7 @@ describe("loadSettings", () => {
   it("returns stored dynamicTitles value", () => {
     fs.writeFileSync(
       path.join(tmpDir, ".pi", "agent", "settings.json"),
-      JSON.stringify({ warpNotify: { dynamicTitles: false } }),
+      JSON.stringify({ piWarp: { dynamicTitles: false } }),
     );
     expect(loadSettings()).toEqual({ dynamicTitles: false });
   });
@@ -64,7 +64,7 @@ describe("loadSettings", () => {
   it("fills in default for missing keys", () => {
     fs.writeFileSync(
       path.join(tmpDir, ".pi", "agent", "settings.json"),
-      JSON.stringify({ warpNotify: {} }),
+      JSON.stringify({ piWarp: {} }),
     );
     expect(loadSettings()).toEqual({ dynamicTitles: true });
   });
@@ -88,13 +88,13 @@ describe("saveSetting", () => {
     const raw = JSON.parse(
       fs.readFileSync(path.join(tmpDir, ".pi", "agent", "settings.json"), "utf-8"),
     );
-    expect(raw.warpNotify.dynamicTitles).toBe(false);
+    expect(raw.piWarp.dynamicTitles).toBe(false);
   });
 
-  it("merges with existing warpNotify keys", () => {
+  it("merges with existing piWarp keys", () => {
     fs.writeFileSync(
       path.join(tmpDir, ".pi", "agent", "settings.json"),
-      JSON.stringify({ warpNotify: { dynamicTitles: true } }),
+      JSON.stringify({ piWarp: { dynamicTitles: true } }),
     );
 
     saveSetting("dynamicTitles", false);
@@ -102,7 +102,7 @@ describe("saveSetting", () => {
     const raw = JSON.parse(
       fs.readFileSync(path.join(tmpDir, ".pi", "agent", "settings.json"), "utf-8"),
     );
-    expect(raw.warpNotify.dynamicTitles).toBe(false);
+    expect(raw.piWarp.dynamicTitles).toBe(false);
   });
 
   it("preserves sibling keys in global settings", () => {
@@ -118,7 +118,7 @@ describe("saveSetting", () => {
     );
     expect(raw.theme).toBe("dark");
     expect(raw.defaultProvider).toBe("anthropic");
-    expect(raw.warpNotify.dynamicTitles).toBe(false);
+    expect(raw.piWarp.dynamicTitles).toBe(false);
   });
 });
 
@@ -133,7 +133,7 @@ describe("dynamicTitlesEnabled", () => {
   it("returns false when disabled", () => {
     fs.writeFileSync(
       path.join(tmpDir, ".pi", "agent", "settings.json"),
-      JSON.stringify({ warpNotify: { dynamicTitles: false } }),
+      JSON.stringify({ piWarp: { dynamicTitles: false } }),
     );
     expect(dynamicTitlesEnabled()).toBe(false);
   });
