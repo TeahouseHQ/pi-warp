@@ -46,6 +46,8 @@
     "vitest": "^4.1.6"
   },
   "pi": {
-    "extensions": ["./index.ts"]
+    "extensions": ["./index.ts"],
+    "image": "https://raw.githubusercontent.com/TeahouseHQ/pi-warp/refs/heads/main/static/demo.gif",
+    "video": "https://raw.githubusercontent.com/TeahouseHQ/pi-warp/refs/heads/main/static/piwarp.mp4"
   }
 }
