@@ -10,7 +10,6 @@ pi-warp surfaces pi agent activity inline in Warp — so you always know what th
 
 - **Session tracking** — Warp knows when pi starts and stops a session.
 - **Prompt notifications** — see when your prompt has been submitted and the agent begins working.
-- **Tool result alerts** — get notified each time a tool finishes executing.
 - **Completion signal** — Warp tells you when the agent has finished its work.
 - **Animated terminal title** — an optional braille spinner in your terminal title while the agent is busy.
 
@@ -18,7 +17,6 @@ pi-warp surfaces pi agent activity inline in Warp — so you always know what th
 
 - **[Warp](https://www.warp.dev/)** — build newer than `v0.2026.03.25.08.24.stable_05` (stable) or `v0.2026.03.25.08.24.preview_05` (preview). Dev channel builds are always supported.
 - **[pi](https://github.com/earendil-works/pi-coding-agent)** coding agent.
-- **Node.js** ≥ 20.
 
 > pi-warp detects Warp automatically. If you're running an incompatible build or not inside Warp, the extension silently disables itself — nothing breaks.
 
@@ -38,8 +36,7 @@ You'll see inline Warp notifications as the agent:
 
 1. **Starts a session** — confirms the extension is active.
 2. **Receives your prompt** — shows the agent is working.
-3. **Completes a tool call** — one notification per tool execution.
-4. **Finishes its work** — lets you know the agent is done.
+3. **Finishes its work** — lets you know the agent is done.
 
 ### Settings
 
